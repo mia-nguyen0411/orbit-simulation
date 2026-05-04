@@ -10,6 +10,23 @@ satellite = Satellite()
 #define center to draw orbit view for centered earth
 center = (400, 400)
 
+#create font with data to show
+font = pygame.font.SysFont("consolas", 20)
+speed = (satellite.velocity[0]**2 + satellite.velocity[1]**2)**0.5
+altitude = (satellite.position[0]**2 + satellite.position[1]**2)**0.5
+
+texts = [
+    f"Altitude: {altitude:.2f} units",
+    f"Speed: {speed: .2f} units/s",
+    f"VX: {satellite.velocity[0]:.2f} units/s",
+    f"VY: {satellite.velocity[1]:.2f} units/s"
+]
+
+# function to print the text to the screen
+for i, t in enumerate(texts):
+    text = font.render(t, True, (0, 255, 0))
+    screen.blit(text, (10, 10 + i*20))
+
 def to_screen(position):
     scale = 2 # scale factor to convert from simulation units to screen pixels
     return ((int(center[0]) + position[0] * scale), 
