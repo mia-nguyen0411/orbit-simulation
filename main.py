@@ -21,11 +21,12 @@ texts = [
     f"VX: {satellite.velocity[0]:.2f} units/s",
     f"VY: {satellite.velocity[1]:.2f} units/s"
 ]
+status = "STABLE ORBIT"
 
-# function to print the text to the screen
-for i, t in enumerate(texts):
-    text = font.render(t, True, (0, 255, 0))
-    screen.blit(text, (10, 10 + i*20))
+if altitude < 50:
+    status = "RE-ENTRY WARNING"
+if altitude > 5:
+    status = "ESCAPE TRAJECTORY WARNING"
 
 def to_screen(position):
     scale = 2  # scale factor to convert from simulation units to screen pixels
@@ -34,9 +35,17 @@ def to_screen(position):
 
 running = True
 while running:
+    keys = pygame.key.get_pressed()
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+
+        if keys[pygame.K_UP]:
+            satellite.velocity[1] += 0.1  # Increase the y-component of velocity
+        
+        if keys[pygame.K_DOWN]:
+            satellite.velocity[1] -= 0.1  # Decrease the y-component of velocity
 
     dt = clock.tick(60) / 1000.0  # seconds elapsed since last frame (capped at 60 fps)
     satellite.update(dt)
@@ -45,10 +54,17 @@ while running:
 
     pygame.draw.circle(screen, (0, 100, 255), center, 20)  # Draw Earth
 
+    # function to print the text to the screen
+    for i, t in enumerate(texts):
+        text = font.render(t, True, (0, 255, 0))
+        screen.blit(text, (10, 10 + i*20))    
+
     for p in satellite.trail:
-        pygame.draw.circle(screen, (0, 150, 0), to_screen(p), 2)  # Draw trail
+        pygame.draw.circle(screen, (100, 150, 100), to_screen(p), 3)  # Draw trail
 
     pygame.draw.circle(screen, (255, 255, 255), to_screen(satellite.position), 5)  # Draw satellite
+    status_text = font.render(status, True, (255, 0, 0))
+    screen.blit(status_text, (500, 20))
 
     pygame.display.flip()
 
