@@ -50,7 +50,7 @@ while running:
     dt = clock.tick(60) / 1000.0  # seconds elapsed since last frame (capped at 60 fps)
     satellite.update(dt)
 
-    screen.fill((0, 0, 0))  # Clear screen to black each frame
+    screen.fill((5, 5, 15))  # Clear screen to black each frame
 
     pygame.draw.circle(screen, (0, 100, 255), center, 20)  # Draw Earth
 
@@ -61,6 +61,9 @@ while running:
 
     for p in satellite.trail:
         pygame.draw.circle(screen, (100, 150, 100), to_screen(p), 3)  # Draw trail
+
+    for r in range(100, 400, 100):
+        pygame.draw.circle(screen, (50, 50, 50), center, r, 1) # draw  fried lines like radar
 
     pygame.draw.circle(screen, (255, 255, 255), to_screen(satellite.position), 5)  # Draw satellite
     status_text = font.render(status, True, (255, 0, 0))
