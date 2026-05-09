@@ -2,13 +2,13 @@ import pygame
 from satellite import Satellite
 
 pygame.init()
-screen = pygame.display.set_mode((800, 800))
+screen = pygame.display.set_mode((900, 900))
 clock = pygame.time.Clock()
 
 satellite = Satellite()
 
 #define center to draw orbit view for centered earth
-center = (400, 400)
+center = (450, 450)
 
 #create font with data to show
 font = pygame.font.SysFont("consolas", 20)
@@ -32,6 +32,17 @@ def to_screen(position):
     scale = 2  # scale factor to convert from simulation units to screen pixels
     return (int(center[0] + position[0] * scale),
             int(center[1] + position[1] * scale))
+
+# draw vector arrow
+def draw_vector(screen, start, vector, scale=20):
+    # Calculate the end point of the arrow based on the start point, vector and scale factor
+    end = (
+        int(start[0] + vector[0] * scale),
+        int(start[1] + vector[1] * scale)
+    )
+
+    pygame.draw.line(screen, (255, 0, 0), start, end, 2) # Draw the arrow line
+    pygame.draw.circle(screen, (255, 0, 0), end, 4) #Draw the arrow head as a circle at the end point
 
 running = True
 while running:
@@ -66,8 +77,9 @@ while running:
         pygame.draw.circle(screen, (50, 50, 50), center, r, 1) # draw  fried lines like radar
 
     pygame.draw.circle(screen, (255, 255, 255), to_screen(satellite.position), 5)  # Draw satellite
+    draw_vector(screen, to_screen(satellite.position), satellite.velocity) # Draw velocity vector
     status_text = font.render(status, True, (255, 0, 0))
-    screen.blit(status_text, (500, 20))
+    screen.blit(status_text, (600, 20))
 
     pygame.display.flip()
 
