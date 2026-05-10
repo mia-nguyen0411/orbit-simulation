@@ -44,6 +44,29 @@ def draw_vector(screen, start, vector, scale=20):
     pygame.draw.line(screen, (255, 0, 0), start, end, 2) # Draw the arrow line
     pygame.draw.circle(screen, (255, 0, 0), end, 4) #Draw the arrow head as a circle at the end point
 
+# draw altitude graph
+def draw_graph(screen, data, x, y, width, height):
+    if len(data) < 2:
+        return # not enough data to draw graph
+    
+    max_value = max(data)
+    min_value = min(data)
+
+    points = []
+
+    for i, value in enumerate(data): # Calculate the x and y coordinates for each data point in the graph
+        px = x + (i / len(data)) * width # x coordinate based on index and total width
+
+        normalised = (value - min_value) / (max_value - min_value + 1e-5) # normalise value to range [0, 1]
+
+        py = y + height - normalised * height # y coordinate based on normalised value and total height
+
+        points.append((px, py))
+    
+    pygame.draw.rect(screen, (50, 50, 50), (x, y, width, height), 1) # Draw graph border
+
+    pygame.draw.lines(screen, (0, 255, 0), False, points, 2) # Draw the graph line from points
+
 running = True
 while running:
     keys = pygame.key.get_pressed()
@@ -77,7 +100,8 @@ while running:
         pygame.draw.circle(screen, (50, 50, 50), center, r, 1) # draw  fried lines like radar
 
     pygame.draw.circle(screen, (255, 255, 255), to_screen(satellite.position), 5)  # Draw satellite
-    draw_vector(screen, to_screen(satellite.position), satellite.velocity) # Draw velocity vector
+    draw_vector(screen, to_screen(satellite.position), satellite.velocity)# Draw velocity vector
+    draw_graph(screen, satellite.altitude_history, 500, 500, 250, 150)
     status_text = font.render(status, True, (255, 0, 0))
     screen.blit(status_text, (600, 20))
 
