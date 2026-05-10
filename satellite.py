@@ -6,6 +6,7 @@ class Satellite:
         self.velocity = np.array([0.0, 1.2]) # Set initial velocity for a satellite
         self.G = 2000 # set gravitational constant
         self.trail = [] # list to store the satellite's trail for visualisation
+        self.altitude_history = [] # list to store altitude history for visualisation
 
     # Update the satellite's velocity and position based on the gravitational force from the earth and the time step dt from the self and dt parameters
     def update(self, dt):
@@ -23,4 +24,11 @@ class Satellite:
 
         if len(self.trail) > 500: #Limit the trail length to 500 points
             self.trail.pop(0) # Remove the oldest point from the trail to maintain the length
+
+        # calculate altitude and store it in the history
+        altitude = np.linalg.norm(self.position) # Calculate altitude as the distance from the earth's center
+        self.altitude_history.append(altitude) # Add the current altitude to the history
+
+        if len(self.altitude_history) > 300: # limit the altitude history length to 300 points
+            self.altitude_history.pop(0) # Remove the oldest altitude from the history to maintain the length
         
