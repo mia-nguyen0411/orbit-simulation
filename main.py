@@ -93,8 +93,10 @@ while running:
         text = font.render(t, True, (0, 255, 0))
         screen.blit(text, (10, 10 + i*20))    
 
-    for p in satellite.trail:
-        pygame.draw.circle(screen, (100, 150, 100), to_screen(p), 3)  # Draw trail
+    # Draw trail as connected line instead of individual circles
+    if len(satellite.trail) > 1:
+        trail_points = [to_screen(p) for p in satellite.trail]
+        pygame.draw.lines(screen, (100, 150, 100), trail_points, 1)
 
     for r in range(100, 400, 100):
         pygame.draw.circle(screen, (50, 50, 50), center, r, 1) # draw  fried lines like radar
