@@ -2,7 +2,7 @@ import pygame
 from satellite import Satellite
 
 pygame.init()
-screen = pygame.display.set_mode((900, 900))
+screen = pygame.display.set_mode((1000, 1000))
 clock = pygame.time.Clock()
 
 satellite = Satellite()
@@ -23,13 +23,13 @@ texts = [
 ]
 status = "STABLE ORBIT"
 
-if altitude < 50:
+if altitude < (50*4e5 + 6.371e6):
     status = "RE-ENTRY WARNING"
-if altitude > 5:
+if altitude > (5*4e5 + 6.371e6):
     status = "ESCAPE TRAJECTORY WARNING"
 
 def to_screen(position):
-    scale = 2  # scale factor to convert from simulation units to screen pixels
+    scale = 4e-5  # scale factor to convert from simulation units to screen pixels
     return (int(center[0] + position[0] * scale),
             int(center[1] + position[1] * scale))
 
@@ -96,16 +96,16 @@ while running:
     # Draw trail as connected line instead of individual circles
     if len(satellite.trail) > 1:
         trail_points = [to_screen(p) for p in satellite.trail]
-        pygame.draw.lines(screen, (100, 150, 100), trail_points, 1)
+        pygame.draw.lines(screen, (100, 150, 100), False, trail_points, 1)
 
     for r in range(100, 400, 100):
         pygame.draw.circle(screen, (50, 50, 50), center, r, 1) # draw  fried lines like radar
 
     pygame.draw.circle(screen, (255, 255, 255), to_screen(satellite.position), 5)  # Draw satellite
-    draw_vector(screen, to_screen(satellite.position), satellite.velocity)# Draw velocity vector
+    draw_vector(screen, to_screen(satellite.position), satellite.velocity, scale=0.015)# Draw velocity vector
     draw_graph(screen, satellite.altitude_history, 500, 500, 250, 150)
     status_text = font.render(status, True, (255, 0, 0))
-    screen.blit(status_text, (600, 20))
+    screen.blit(status_text, (800, 20))
 
     pygame.display.flip()
 
