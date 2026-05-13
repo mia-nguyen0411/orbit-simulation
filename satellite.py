@@ -8,7 +8,15 @@ class Satellite:
         self.velocity = np.array([0.0, 7670.0]) # Set initial velocity for a satellite
         self.trail = [] # list to store the satellite's trail for visualisation
         self.altitude_history = [] # list to store altitude history for visualisation
-        
+        self.target_altitude = EARTH_RADIUS + 4e5 # Set target altitude for the satellite to maintain stable orbit
+
+    # Autopilot function to adjust velocity to maintain target altitude
+    def autopilot(self):
+        altitude = np.linalg.norm(self.position) # Calculate current altitude as distance from earth's center
+        error = self.target_altitude - altitude # Calculate error from target altitude to the current 
+        direction = self.velocity / np.linalg.norm(self.velocity) # get the direction of the current vel as unit vector
+        correction_strength = 0.05
+        self.velocity += direction * error * correction_strength
 
     # Update the satellite's velocity and position based on the gravitational force from the earth and the time step dt from the self and dt parameters
     def update(self, dt):
@@ -32,6 +40,7 @@ class Satellite:
         # calculate altitude and store it in the history
         altitude = np.linalg.norm(self.position) # Calculate altitude as the distance from the earth's center
         self.altitude_history.append(altitude) # Add the current altitude to the history
+        self.autopilot() # Call the autopilot function to adjust velocity for maintaining target altitude
 
         if len(self.altitude_history) > 300: # limit the altitude history length to 300 points
             self.altitude_history.pop(0) # Remove the oldest altitude from the history to maintain the length
