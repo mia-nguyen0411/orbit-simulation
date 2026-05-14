@@ -1,9 +1,11 @@
 import pygame
 from satellite import Satellite
+import random
 
 pygame.init()
 screen = pygame.display.set_mode((1000, 1000))
 clock = pygame.time.Clock()
+star = [(random.randint(0,980), random.randint(0, 1223)) for _ in range(120)]
 
 satellite = Satellite()
 
@@ -85,6 +87,9 @@ while running:
     satellite.update(dt)
 
     screen.fill((5, 5, 15))  # Clear screen to black each frame
+
+    for s in star:
+        pygame.draw.circle(screen, (255, 255, 255), s, 1)
 
     pygame.draw.circle(screen, (0, 100, 255), center, 20)  # Draw Earth
 
