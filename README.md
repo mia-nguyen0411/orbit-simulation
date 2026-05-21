@@ -1,6 +1,8 @@
 # Orbit simulation
 Personal orbit simulation project using pygame
 
+## Screenshots
+<img width="500" alt="image" src="https://github.com/user-attachments/assets/831deab9-000a-4e4e-be7e-479cabbdcbc0" />
 <img width="350" alt="image" src="https://github.com/user-attachments/assets/7e0ad13a-5e2c-4ba7-a038-588d0ee975a3" />
 
 ## Purpose of this project
