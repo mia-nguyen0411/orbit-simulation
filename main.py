@@ -1,6 +1,7 @@
 import pygame
 from satellite import Satellite
 from planet import Planet
+from asteroid import Asteroid
 import random
 
 pygame.init()
@@ -26,6 +27,10 @@ moon = Planet(
     speed = 0.5
 )
 
+asteroids =[]
+
+for _ in range (300):
+    asteroids.append(Asteroid(scale))
 
 #define center to draw orbit view for centered earth
 center = (450, 450)
@@ -107,6 +112,9 @@ while running:
     mars.update(dt)
     moon.update(dt)
 
+    for asteroid in asteroids:
+        asteroid.update(dt)
+
     screen.fill((5, 5, 15))  # Clear screen to black each frame
 
     for s in star:
@@ -128,6 +136,11 @@ while running:
 
     # mars text
     mars_text = font.render("Mars", True, (255, 255, 255))
+
+    # draw asteroids
+    for asteroid in asteroids:
+        position = to_screen(asteroid.get_position())
+        pygame.draw.circle(screen, (150, 150, 150), position, asteroid.size)
 
     # function to print the text to the screen
     for i, t in enumerate(texts):
