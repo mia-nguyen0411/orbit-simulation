@@ -11,6 +11,10 @@ star = [(random.randint(0,980), random.randint(0, 1223)) for _ in range(120)]
 
 scale = 4e-5
 
+zoom = 1.0
+MIN_ZOOM = 0.2
+MAX_ZOOM = 20.0
+
 satellite = Satellite()
 
 mars = Planet(
@@ -54,9 +58,9 @@ if altitude > (5*4e5 + 6.371e6):
     status = "ESCAPE TRAJECTORY WARNING"
 
 def to_screen(position):
-    scale = 4e-5  # scale factor to convert from simulation units to screen pixels
-    return (int(center[0] + position[0] * scale),
-            int(center[1] + position[1] * scale))
+    current_scale = scale * zoom  # apply zoom as a multiplier to the base simulation scale
+    return (int(center[0] + position[0] * current_scale),
+            int(center[1] + position[1] * current_scale))
 
 # draw vector arrow
 def draw_vector(screen, start, vector, scale=20):
@@ -106,6 +110,16 @@ while running:
         if keys[pygame.K_DOWN]:
             satellite.velocity[1] -= 0.1  # Decrease the y-component of velocity
 
+        if event.type == pygame.MOUSEWHEEL:
+
+            if event.y > 0:
+                zoom *= 1.1
+
+            if event.y < 0:
+                zoom *= 0.9
+
+            zoom = max(MIN_ZOOM, min(MAX_ZOOM, zoom))
+
     dt = clock.tick(60) / 1000.0  # seconds elapsed since last frame (capped at 60 fps)
     satellite.update(dt)
 
@@ -131,8 +145,8 @@ while running:
     pygame.draw.circle(screen, moon.color, moon_position, moon.size)
 
     # draw orbit rings
-    pygame.draw.circle(screen, (50, 50, 50), center, 300, 1)
-    pygame.draw.circle(screen, (50, 50, 50), center, 150, 1)
+    pygame.draw.circle(screen, (50, 50, 50), center, max(1, int(300 * zoom)), 1)
+    pygame.draw.circle(screen, (50, 50, 50), center, max(1, int(150 * zoom)), 1)
 
     # mars text
     mars_text = font.render("Mars", True, (255, 255, 255))
@@ -153,7 +167,7 @@ while running:
         pygame.draw.lines(screen, (100, 150, 100), False, trail_points, 1)
 
     for r in range(100, 400, 100):
-        pygame.draw.circle(screen, (50, 50, 50), center, r, 1) # draw  fried lines like radar
+        pygame.draw.circle(screen, (50, 50, 50), center, max(1, int(r * zoom)), 1) # draw  fried lines like radar
 
     pygame.draw.circle(screen, (255, 255, 255), to_screen(satellite.position), 5)  # Draw satellite
     draw_vector(screen, to_screen(satellite.position), satellite.velocity, scale=0.015)# Draw velocity vector
