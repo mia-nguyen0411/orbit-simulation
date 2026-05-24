@@ -161,6 +161,10 @@ while running:
         text = font.render(t, True, (0, 255, 0))
         screen.blit(text, (10, 10 + i*20))    
 
+    # zoom text
+    zoom_text = font.render(f"Zoom: {zoom:.2f}x", True, (255, 255, 0))
+    
+
     # Draw trail as connected line instead of individual circles
     if len(satellite.trail) > 1:
         trail_points = [to_screen(p) for p in satellite.trail]
@@ -175,6 +179,7 @@ while running:
     status_text = font.render(status, True, (255, 0, 0))
     screen.blit(mars_text, (mars_position[0]+10, mars_position[1]))
     screen.blit(status_text, (800, 20))
+    screen.blit(zoom_text, (800, 40))
 
     pygame.display.flip()
 
