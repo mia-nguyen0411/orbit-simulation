@@ -12,6 +12,8 @@ star = [(random.randint(0,980), random.randint(0, 1223)) for _ in range(120)]
 scale = 4e-5
 
 zoom = 1.0
+camera_x = 0
+camera_y = 0
 MIN_ZOOM = 0.2
 MAX_ZOOM = 20.0
 
@@ -59,8 +61,8 @@ if altitude > (5*4e5 + 6.371e6):
 
 def to_screen(position):
     current_scale = scale * zoom  # apply zoom as a multiplier to the base simulation scale
-    return (int(center[0] + position[0] * current_scale),
-            int(center[1] + position[1] * current_scale))
+    return (int(center[0] + (position[0] + camera_x) * current_scale),
+            int(center[1] + (position[1] + camera_y) * current_scale))
 
 # draw vector arrow
 def draw_vector(screen, start, vector, scale=20):
@@ -98,17 +100,9 @@ def draw_graph(screen, data, x, y, width, height):
 
 running = True
 while running:
-    keys = pygame.key.get_pressed()
-
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-
-        if keys[pygame.K_UP]:
-            satellite.velocity[1] += 0.1  # Increase the y-component of velocity
-        
-        if keys[pygame.K_DOWN]:
-            satellite.velocity[1] -= 0.1  # Decrease the y-component of velocity
 
         if event.type == pygame.MOUSEWHEEL:
 
@@ -121,6 +115,27 @@ while running:
             zoom = max(MIN_ZOOM, min(MAX_ZOOM, zoom))
 
     dt = clock.tick(60) / 1000.0  # seconds elapsed since last frame (capped at 60 fps)
+
+    keys = pygame.key.get_pressed()
+
+    # Keep keyboard controls frame-based and convert pan speed from px/s to world units.
+    camera_speed_world = 300 / (scale * zoom)
+    velocity_step = 6.0 * dt
+
+    if keys[pygame.K_UP]:
+        satellite.velocity[1] += velocity_step  # Increase the y-component of velocity
+    if keys[pygame.K_DOWN]:
+        satellite.velocity[1] -= velocity_step  # Decrease the y-component of velocity
+
+    if keys[pygame.K_a]:
+        camera_x += camera_speed_world * dt  # Move camera left
+    if keys[pygame.K_d]:
+        camera_x -= camera_speed_world * dt  # Move camera right
+    if keys[pygame.K_w]:
+        camera_y += camera_speed_world * dt  # Move camera up
+    if keys[pygame.K_s]:
+        camera_y -= camera_speed_world * dt  # Move camera down
+
     satellite.update(dt)
 
     mars.update(dt)
