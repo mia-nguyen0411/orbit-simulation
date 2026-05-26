@@ -10,6 +10,7 @@ clock = pygame.time.Clock()
 star = [(random.randint(0,980), random.randint(0, 1223)) for _ in range(120)]
 
 scale = 4e-5
+simulation_speed = 5.0 # increase to speed up the simulation
 
 zoom = 1.0
 camera_x = 0
@@ -115,6 +116,7 @@ while running:
             zoom = max(MIN_ZOOM, min(MAX_ZOOM, zoom))
 
     dt = clock.tick(60) / 1000.0  # seconds elapsed since last frame (capped at 60 fps)
+    simulation_dt = dt * simulation_speed
 
     keys = pygame.key.get_pressed()
 
@@ -136,13 +138,13 @@ while running:
     if keys[pygame.K_s]:
         camera_y -= camera_speed_world * dt  # Move camera down
 
-    satellite.update(dt)
+    satellite.update(simulation_dt)
 
-    mars.update(dt)
-    moon.update(dt)
+    mars.update(simulation_dt)
+    moon.update(simulation_dt)
 
     for asteroid in asteroids:
-        asteroid.update(dt)
+        asteroid.update(simulation_dt)
 
     screen.fill((5, 5, 15))  # Clear screen to black each frame
 
@@ -179,6 +181,8 @@ while running:
     # zoom text
     zoom_text = font.render(f"Zoom: {zoom:.2f}x", True, (255, 255, 0))
     
+    #simulation status text
+    simulation_status = font.render(f"Simulation speed: {simulation_speed:.1f}x", True, (255, 255, 0))
 
     # Draw trail as connected line instead of individual circles
     if len(satellite.trail) > 1:
@@ -195,6 +199,7 @@ while running:
     screen.blit(mars_text, (mars_position[0]+10, mars_position[1]))
     screen.blit(status_text, (800, 20))
     screen.blit(zoom_text, (800, 40))
+    screen.blit(simulation_status, (700, 60))
 
     pygame.display.flip()
 
