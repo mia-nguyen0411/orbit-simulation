@@ -13,6 +13,8 @@ scale = 4e-5
 simulation_speed = 5.0 # increase to speed up the simulation
 
 zoom = 1.0
+default_zoom = 1.0
+
 camera_x = 0
 camera_y = 0
 MIN_ZOOM = 0.2
@@ -44,6 +46,9 @@ center = (450, 450)
 
 #create font with data to show
 font = pygame.font.SysFont("consolas", 20)
+reset_button_shape = pygame.Rect(780, 90, 180, 35)
+reset_button_text = font.render("Reset Zoom", True, (20, 20, 20))
+
 speed = (satellite.velocity[0]**2 + satellite.velocity[1]**2)**0.5
 altitude = (satellite.position[0]**2 + satellite.position[1]**2)**0.5
 
@@ -104,6 +109,11 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+            if reset_button_shape.collidepoint(event.pos):
+                zoom = default_zoom
+
 
         if event.type == pygame.MOUSEWHEEL:
 
@@ -183,6 +193,14 @@ while running:
     
     #simulation status text
     simulation_status = font.render(f"Simulation speed: {simulation_speed:.1f}x", True, (255, 255, 0))
+
+    mouse_position = pygame.mouse.get_pos()
+    is_hovering_reset = reset_button_shape.collidepoint(mouse_position)
+    button_color = (240, 220, 120) if is_hovering_reset else (220, 200, 80)
+    pygame.draw.rect(screen, button_color, reset_button_shape, border_radius=6)
+    pygame.draw.rect(screen, (30, 30, 30), reset_button_shape, 2, border_radius=6)
+    screen.blit(reset_button_text, reset_button_text.get_rect(center=reset_button_shape.center))
+
 
     # Draw trail as connected line instead of individual circles
     if len(satellite.trail) > 1:
