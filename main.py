@@ -10,7 +10,8 @@ clock = pygame.time.Clock()
 star = [(random.randint(0,980), random.randint(0, 1223)) for _ in range(120)]
 
 scale = 4e-5
-simulation_speed = 5.0 # increase to speed up the simulation
+simulation_speed = 5.0
+default_speed = 3.0
 
 zoom = 1.0
 default_zoom = 1.0
@@ -46,8 +47,21 @@ center = (450, 450)
 
 #create font with data to show
 font = pygame.font.SysFont("consolas", 20)
-reset_button_shape = pygame.Rect(780, 90, 180, 35)
-reset_button_text = font.render("Reset Zoom", True, (20, 20, 20))
+
+#reset button
+BUTTON_WIDTH = 210
+BUTTON_HEIGHT = 42
+BUTTON_MARGIN_X = 20
+BUTTON_MARGIN_Y = 800
+reset_button_shape = pygame.Rect(
+    screen.get_width() - BUTTON_WIDTH - BUTTON_MARGIN_X,
+    BUTTON_MARGIN_Y,
+    BUTTON_WIDTH,
+    BUTTON_HEIGHT
+)
+button_font = pygame.font.SysFont("bahnschrift", 18, bold=True)
+
+# 
 
 speed = (satellite.velocity[0]**2 + satellite.velocity[1]**2)**0.5
 altitude = (satellite.position[0]**2 + satellite.position[1]**2)**0.5
@@ -113,6 +127,7 @@ while running:
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             if reset_button_shape.collidepoint(event.pos):
                 zoom = default_zoom
+                simulation_speed = default_speed
 
 
         if event.type == pygame.MOUSEWHEEL:
@@ -196,10 +211,36 @@ while running:
 
     mouse_position = pygame.mouse.get_pos()
     is_hovering_reset = reset_button_shape.collidepoint(mouse_position)
-    button_color = (240, 220, 120) if is_hovering_reset else (220, 200, 80)
-    pygame.draw.rect(screen, button_color, reset_button_shape, border_radius=6)
-    pygame.draw.rect(screen, (30, 30, 30), reset_button_shape, 2, border_radius=6)
-    screen.blit(reset_button_text, reset_button_text.get_rect(center=reset_button_shape.center))
+    
+    # NASA-inspired mission-control button styling.
+    base_color = (25, 33, 42) if is_hovering_reset else (18, 25, 34)
+    frame_color = (90, 130, 160) if is_hovering_reset else (70, 105, 130)
+    accent_color = (0, 210, 255) if is_hovering_reset else (0, 165, 215)
+    text_color = (245, 250, 255)
+
+    pygame.draw.rect(screen, base_color, reset_button_shape, border_radius=4)
+    pygame.draw.rect(screen, frame_color, reset_button_shape, 2, border_radius=4)
+
+    # Corner accents emulate instrument panel framing.
+    x, y, w, h = reset_button_shape
+    corner_len = 12
+    pygame.draw.line(screen, accent_color, (x + 1, y + 1), (x + 1 + corner_len, y + 1), 2)
+    pygame.draw.line(screen, accent_color, (x + 1, y + 1), (x + 1, y + 1 + corner_len), 2)
+    pygame.draw.line(screen, accent_color, (x + w - 2, y + 1), (x + w - 2 - corner_len, y + 1), 2)
+    pygame.draw.line(screen, accent_color, (x + w - 2, y + 1), (x + w - 2, y + 1 + corner_len), 2)
+    pygame.draw.line(screen, accent_color, (x + 1, y + h - 2), (x + 1 + corner_len, y + h - 2), 2)
+    pygame.draw.line(screen, accent_color, (x + 1, y + h - 2), (x + 1, y + h - 2 - corner_len), 2)
+    pygame.draw.line(screen, accent_color, (x + w - 2, y + h - 2), (x + w - 2 - corner_len, y + h - 2), 2)
+    pygame.draw.line(screen, accent_color, (x + w - 2, y + h - 2), (x + w - 2, y + h - 2 - corner_len), 2)
+
+    # Small status indicator for a cockpit-style visual cue.
+    indicator_color = (72, 255, 110) if is_hovering_reset else (200, 95, 70)
+    pygame.draw.circle(screen, indicator_color, (x + 14, y + h // 2), 5)
+
+    reset_button_text = button_font.render("RESET ZOOM", True, text_color)
+    text_rect = reset_button_text.get_rect(center=reset_button_shape.center)
+    text_rect.x += 8
+    screen.blit(reset_button_text, text_rect)
 
 
     # Draw trail as connected line instead of individual circles
