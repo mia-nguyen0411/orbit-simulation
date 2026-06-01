@@ -118,6 +118,36 @@ def draw_graph(screen, data, x, y, width, height):
 
     pygame.draw.lines(screen, (0, 255, 0), False, points, 2) # Draw the graph line from points
 
+def update_simulation(dt, simulation_speed, zoom, camera_x, camera_y, satellite, mars, moon, asteroids):
+    simulation_dt = dt * simulation_speed
+    keys = pygame.key.get_pressed()
+
+    camera_speed_world = 300 / (scale * zoom)
+    velocity_step = 6.0 * dt
+
+    if keys[pygame.K_UP]:
+        satellite.velocity[1] += velocity_step
+    if keys[pygame.K_DOWN]:
+        satellite.velocity[1] -= velocity_step
+
+    if keys[pygame.K_a]:
+        camera_x += camera_speed_world * dt
+    if keys[pygame.K_d]:
+        camera_x -= camera_speed_world * dt
+    if keys[pygame.K_w]:
+        camera_y += camera_speed_world * dt
+    if keys[pygame.K_s]:
+        camera_y -= camera_speed_world * dt
+
+    satellite.update(simulation_dt)
+    mars.update(simulation_dt)
+    moon.update(simulation_dt)
+
+    for asteroid in asteroids:
+        asteroid.update(simulation_dt)
+
+    return camera_x, camera_y
+
 running = True
 while running:
     for event in pygame.event.get():
@@ -149,21 +179,7 @@ while running:
     camera_speed_world = 300 / (scale * zoom)
     velocity_step = 6.0 * dt
 
-    if keys[pygame.K_UP]:
-        satellite.velocity[1] += velocity_step  # Increase the y-component of velocity
-    if keys[pygame.K_DOWN]:
-        satellite.velocity[1] -= velocity_step  # Decrease the y-component of velocity
-
-    if keys[pygame.K_a]:
-        camera_x += camera_speed_world * dt  # Move camera left
-    if keys[pygame.K_d]:
-        camera_x -= camera_speed_world * dt  # Move camera right
-    if keys[pygame.K_w]:
-        camera_y += camera_speed_world * dt  # Move camera up
-    if keys[pygame.K_s]:
-        camera_y -= camera_speed_world * dt  # Move camera down
-
-    satellite.update(simulation_dt)
+    camera_x, camera_y = update_simulation(simulation_dt, simulation_speed, zoom, camera_x, camera_y, satellite, mars, moon, asteroids)
 
     mars.update(simulation_dt)
     moon.update(simulation_dt)
