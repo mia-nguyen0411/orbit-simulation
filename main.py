@@ -2,6 +2,7 @@ import pygame
 from satellite import Satellite
 from planet import Planet
 from asteroid import Asteroid
+from simulation import update_simulation, compute_status_and_texts
 import random
 
 pygame.init()
@@ -63,22 +64,6 @@ button_font = pygame.font.SysFont("bahnschrift", 18, bold=True)
 
 # 
 
-speed = (satellite.velocity[0]**2 + satellite.velocity[1]**2)**0.5
-altitude = (satellite.position[0]**2 + satellite.position[1]**2)**0.5
-
-texts = [
-    f"Altitude: {altitude:.2f} units",
-    f"Speed: {speed: .2f} units/s",
-    f"VX: {satellite.velocity[0]:.2f} units/s",
-    f"VY: {satellite.velocity[1]:.2f} units/s"
-]
-status = "STABLE ORBIT"
-
-if altitude < (50*4e5 + 6.371e6):
-    status = "RE-ENTRY WARNING"
-if altitude > (5*4e5 + 6.371e6):
-    status = "ESCAPE TRAJECTORY WARNING"
-
 def to_screen(position):
     current_scale = scale * zoom  # apply zoom as a multiplier to the base simulation scale
     return (int(center[0] + (position[0] + camera_x) * current_scale),
@@ -118,35 +103,6 @@ def draw_graph(screen, data, x, y, width, height):
 
     pygame.draw.lines(screen, (0, 255, 0), False, points, 2) # Draw the graph line from points
 
-def update_simulation(dt, simulation_speed, zoom, camera_x, camera_y, satellite, mars, moon, asteroids):
-    simulation_dt = dt * simulation_speed
-    keys = pygame.key.get_pressed()
-
-    camera_speed_world = 300 / (scale * zoom)
-    velocity_step = 6.0 * dt
-
-    if keys[pygame.K_UP]:
-        satellite.velocity[1] += velocity_step
-    if keys[pygame.K_DOWN]:
-        satellite.velocity[1] -= velocity_step
-
-    if keys[pygame.K_a]:
-        camera_x += camera_speed_world * dt
-    if keys[pygame.K_d]:
-        camera_x -= camera_speed_world * dt
-    if keys[pygame.K_w]:
-        camera_y += camera_speed_world * dt
-    if keys[pygame.K_s]:
-        camera_y -= camera_speed_world * dt
-
-    satellite.update(simulation_dt)
-    mars.update(simulation_dt)
-    moon.update(simulation_dt)
-
-    for asteroid in asteroids:
-        asteroid.update(simulation_dt)
-
-    return camera_x, camera_y
 
 running = True
 while running:
@@ -171,21 +127,12 @@ while running:
             zoom = max(MIN_ZOOM, min(MAX_ZOOM, zoom))
 
     dt = clock.tick(60) / 1000.0  # seconds elapsed since last frame (capped at 60 fps)
-    simulation_dt = dt * simulation_speed
-
-    keys = pygame.key.get_pressed()
 
     # Keep keyboard controls frame-based and convert pan speed from px/s to world units.
     camera_speed_world = 300 / (scale * zoom)
     velocity_step = 6.0 * dt
 
-    camera_x, camera_y = update_simulation(simulation_dt, simulation_speed, zoom, camera_x, camera_y, satellite, mars, moon, asteroids)
-
-    mars.update(simulation_dt)
-    moon.update(simulation_dt)
-
-    for asteroid in asteroids:
-        asteroid.update(simulation_dt)
+    camera_x, camera_y = update_simulation(dt, simulation_speed, zoom, camera_x, camera_y, scale, satellite, mars, moon, asteroids)
 
     screen.fill((5, 5, 15))  # Clear screen to black each frame
 
@@ -270,11 +217,12 @@ while running:
     pygame.draw.circle(screen, (255, 255, 255), to_screen(satellite.position), 5)  # Draw satellite
     draw_vector(screen, to_screen(satellite.position), satellite.velocity, scale=0.015)# Draw velocity vector
     draw_graph(screen, satellite.altitude_history, 500, 500, 250, 150)
+    texts, status = compute_status_and_texts(satellite)
     status_text = font.render(status, True, (255, 0, 0))
-    screen.blit(mars_text, (mars_position[0]+10, mars_position[1]))
-    screen.blit(status_text, (800, 20))
-    screen.blit(zoom_text, (800, 40))
-    screen.blit(simulation_status, (700, 60))
+    for i, t in enumerate(texts):
+        text = font.render(t, True, (0, 255, 0))
+        screen.blit(text, (mars_position[0]+10, mars_position[1] + i*20))
+    screen.blit(status_text, (700, 60))
 
     pygame.display.flip()
 
