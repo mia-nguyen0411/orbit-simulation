@@ -128,11 +128,8 @@ while running:
 
     dt = clock.tick(60) / 1000.0  # seconds elapsed since last frame (capped at 60 fps)
 
-    # Keep keyboard controls frame-based and convert pan speed from px/s to world units.
-    camera_speed_world = 300 / (scale * zoom)
-    velocity_step = 6.0 * dt
-
     camera_x, camera_y = update_simulation(dt, simulation_speed, zoom, camera_x, camera_y, scale, satellite, mars, moon, asteroids)
+    texts, status = compute_status_and_texts(satellite)
 
     screen.fill((5, 5, 15))  # Clear screen to black each frame
 
@@ -217,11 +214,7 @@ while running:
     pygame.draw.circle(screen, (255, 255, 255), to_screen(satellite.position), 5)  # Draw satellite
     draw_vector(screen, to_screen(satellite.position), satellite.velocity, scale=0.015)# Draw velocity vector
     draw_graph(screen, satellite.altitude_history, 500, 500, 250, 150)
-    texts, status = compute_status_and_texts(satellite)
     status_text = font.render(status, True, (255, 0, 0))
-    for i, t in enumerate(texts):
-        text = font.render(t, True, (0, 255, 0))
-        screen.blit(text, (mars_position[0]+10, mars_position[1] + i*20))
     screen.blit(status_text, (700, 60))
 
     pygame.display.flip()
