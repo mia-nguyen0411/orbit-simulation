@@ -1,7 +1,7 @@
 import pygame
-from typing import List, Tuple
+from typing import List, Tuple, tuple
 
-def update_simulation(dt: float, simulation_speed: float, zoom: float, camera_x: float, camera_y: float, scale: float, satellite, mars, moon, asteroids: List) -> tuple[float, float]:
+def update_simulation(dt: float, simulation_speed: float, zoom: float, camera_x: float, camera_y: float, scale: float, satellite, mars, moon, asteroids: List) -> Tuple[float, float]:
     simulation_dt = dt * simulation_speed
     keys = pygame.key.get_pressed()
 
