@@ -60,9 +60,8 @@ reset_button_shape = pygame.Rect(
     BUTTON_WIDTH,
     BUTTON_HEIGHT
 )
-button_font = pygame.font.SysFont("bahnschrift", 18, bold=True)
 
-# 
+button_font = pygame.font.SysFont("bahnschrift", 18, bold=True)
 
 def to_screen(position):
     current_scale = scale * zoom  # apply zoom as a multiplier to the base simulation scale
