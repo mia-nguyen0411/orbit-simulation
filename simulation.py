@@ -1,5 +1,5 @@
 import pygame
-from typing import List, Tuple, tuple
+from typing import List, Tuple
 
 def update_simulation(dt: float, simulation_speed: float, zoom: float, camera_x: float, camera_y: float, scale: float, satellite, mars, moon, asteroids: List) -> Tuple[float, float]:
     simulation_dt = dt * simulation_speed
@@ -21,6 +21,7 @@ def update_simulation(dt: float, simulation_speed: float, zoom: float, camera_x:
         camera_y += camera_speed_world * dt
     if keys[pygame.K_s]:
         camera_y -= camera_speed_world * dt
+
 
     satellite.update(simulation_dt)
     mars.update(simulation_dt)
