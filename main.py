@@ -16,11 +16,12 @@ default_speed = 3.0
 
 zoom = 1.0
 default_zoom = 1.0
+MIN_ZOOM = 0.2
+MAX_ZOOM = 20.0
 
 camera_x = 0
 camera_y = 0
-MIN_ZOOM = 0.2
-MAX_ZOOM = 20.0
+
 
 satellite = Satellite()
 
