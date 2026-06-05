@@ -22,7 +22,6 @@ def update_simulation(dt: float, simulation_speed: float, zoom: float, camera_x:
     if keys[pygame.K_s]:
         camera_y -= camera_speed_world * dt
 
-
     satellite.update(simulation_dt)
     mars.update(simulation_dt)
     moon.update(simulation_dt)

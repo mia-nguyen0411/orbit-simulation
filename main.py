@@ -22,7 +22,6 @@ MAX_ZOOM = 20.0
 camera_x = 0
 camera_y = 0
 
-
 satellite = Satellite()
 
 mars = Planet(
@@ -103,7 +102,6 @@ def draw_graph(screen, data, x, y, width, height):
 
     pygame.draw.lines(screen, (0, 255, 0), False, points, 2) # Draw the graph line from points
 
-
 running = True
 while running:
     for event in pygame.event.get():
@@ -114,7 +112,6 @@ while running:
             if reset_button_shape.collidepoint(event.pos):
                 zoom = default_zoom
                 simulation_speed = default_speed
-
 
         if event.type == pygame.MOUSEWHEEL:
 
@@ -201,7 +198,6 @@ while running:
     text_rect = reset_button_text.get_rect(center=reset_button_shape.center)
     text_rect.x += 8
     screen.blit(reset_button_text, text_rect)
-
 
     # Draw trail as connected line instead of individual circles
     if len(satellite.trail) > 1:
