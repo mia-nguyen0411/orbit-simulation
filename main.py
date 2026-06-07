@@ -50,9 +50,6 @@ center = (450, 450)
 #create font with data to show
 font = pygame.font.SysFont("consolas", 20)
 
-
-
-
 def to_screen(position):
     current_scale = scale * zoom  # apply zoom as a multiplier to the base simulation scale
     return (int(center[0] + (position[0] + camera_x) * current_scale),
@@ -157,10 +154,6 @@ while running:
     simulation_status = font.render(f"Simulation speed: {simulation_speed:.1f}x", True, (255, 255, 0))
 
     mouse_position = pygame.mouse.get_pos()
-    
-
-
-
 
     draw_reset_button(screen, mouse_position)
 
