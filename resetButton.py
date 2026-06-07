@@ -15,7 +15,6 @@ def get_reset_button_rect(screen):
         BUTTON_HEIGHT
     )
 
-
 def draw_reset_button(screen, mouse_position):
     reset_button_shape = get_reset_button_rect(screen)
 
