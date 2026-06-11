@@ -23,7 +23,24 @@ MAX_ZOOM = 20.0
 camera_x = 0
 camera_y = 0
 
-satellite = Satellite()
+# Add more satellites here by copying one entry and changing the values.
+satellite_configs = [
+    {
+        "name": "Explorer-1",
+        "color": (255, 255, 255),
+        "altitude": 4e5,
+        "velocity": (0.0, 7670.0),
+    },
+    {
+        "name": "Aurora",
+        "color": (255, 180, 0),
+        "altitude": 5e5,
+        "velocity": (0.0, 7600.0),
+    },
+]
+
+satellites = [Satellite(**config) for config in satellite_configs]
+primary_satellite = satellites[0]
 
 mars = Planet(
     orbit_radius = (300 / scale),
@@ -112,8 +129,8 @@ while running:
 
     dt = clock.tick(60) / 1000.0  # seconds elapsed since last frame (capped at 60 fps)
 
-    camera_x, camera_y = update_simulation(dt, simulation_speed, zoom, camera_x, camera_y, scale, satellite, mars, moon, asteroids)
-    texts, status = compute_status_and_texts(satellite)
+    camera_x, camera_y = update_simulation(dt, simulation_speed, zoom, camera_x, camera_y, scale, satellites, mars, moon, asteroids)
+    texts_by_satellite, statuses = compute_status_and_texts(satellites)
 
     screen.fill((5, 5, 15))  # Clear screen to black each frame
 
@@ -143,9 +160,13 @@ while running:
         pygame.draw.circle(screen, (150, 150, 150), position, asteroid.size)
 
     # function to print the text to the screen
-    for i, t in enumerate(texts):
-        text = font.render(t, True, (0, 255, 0))
-        screen.blit(text, (10, 10 + i*20))    
+    text_line = 0
+    for texts in texts_by_satellite:
+        for t in texts:
+            text = font.render(t, True, (0, 255, 0))
+            screen.blit(text, (10, 10 + text_line * 20))
+            text_line += 1
+        text_line += 1
 
     # zoom text
     zoom_text = font.render(f"Zoom: {zoom:.2f}x", True, (255, 255, 0))
@@ -158,18 +179,21 @@ while running:
     draw_reset_button(screen, mouse_position)
 
     # Draw trail as connected line instead of individual circles
-    if len(satellite.trail) > 1:
-        trail_points = [to_screen(p) for p in satellite.trail]
-        pygame.draw.lines(screen, (100, 150, 100), False, trail_points, 1)
+    for satellite in satellites:
+        if len(satellite.trail) > 1:
+            trail_points = [to_screen(p) for p in satellite.trail]
+            pygame.draw.lines(screen, satellite.color, False, trail_points, 1)
 
     for r in range(100, 400, 100):
         pygame.draw.circle(screen, (50, 50, 50), center, max(1, int(r * zoom)), 1) # draw  fried lines like radar
 
-    pygame.draw.circle(screen, (255, 255, 255), to_screen(satellite.position), 5)  # Draw satellite
-    draw_vector(screen, to_screen(satellite.position), satellite.velocity, scale=0.015)# Draw velocity vector
-    draw_graph(screen, satellite.altitude_history, 500, 500, 250, 150)
-    status_text = font.render(status, True, (255, 0, 0))
-    screen.blit(status_text, (700, 60))
+    for index, satellite in enumerate(satellites):
+        pygame.draw.circle(screen, satellite.color, to_screen(satellite.position), 5)  # Draw satellite
+        draw_vector(screen, to_screen(satellite.position), satellite.velocity, scale=0.015)# Draw velocity vector
+        status_text = font.render(statuses[index], True, satellite.color)
+        screen.blit(status_text, (700, 60 + index * 25))
+
+    draw_graph(screen, primary_satellite.altitude_history, 500, 500, 250, 150)
 
     pygame.display.flip()
 
